@@ -1,9 +1,9 @@
-package by.kravchenko.elinexttest;
+package by.kravchenko.elinexttest.exceptions;
 
 /**
  * @author Pavel Kravchenko
  */
-public class TooManyConstructorsException extends Exception{
+public class TooManyConstructorsException extends RuntimeException{
     public TooManyConstructorsException() {
     }
 

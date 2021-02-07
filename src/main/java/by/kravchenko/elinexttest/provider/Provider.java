@@ -1,4 +1,4 @@
-package by.kravchenko.elinexttest;
+package by.kravchenko.elinexttest.provider;
 
 /**
  * @author Pavel Kravchenko

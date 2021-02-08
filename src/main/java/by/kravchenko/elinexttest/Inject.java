@@ -1,4 +1,4 @@
-package by.kravchenko.elinexttest.injection;
+package by.kravchenko.elinexttest;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

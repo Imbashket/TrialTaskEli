@@ -1,10 +1,10 @@
-package by.kravchenko.elinexttest.injection;
+package by.kravchenko.elinexttest.impl;
 
-import by.kravchenko.elinexttest.exceptions.BindingNotFoundException;
-import by.kravchenko.elinexttest.exceptions.ConstructorNotFoundException;
-import by.kravchenko.elinexttest.exceptions.TooManyConstructorsException;
-import by.kravchenko.elinexttest.provider.Provider;
-import by.kravchenko.elinexttest.provider.ProviderImpl;
+import by.kravchenko.elinexttest.Inject;
+import by.kravchenko.elinexttest.Injector;
+import by.kravchenko.elinexttest.impl.exceptions.ConstructorNotFoundException;
+import by.kravchenko.elinexttest.impl.exceptions.TooManyConstructorsException;
+import by.kravchenko.elinexttest.Provider;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -14,14 +14,26 @@ import java.util.Map;
  * @author Pavel Kravchenko
  */
 public class InjectorImpl implements Injector {
+    private static InjectorImpl instance;
 
-    private Map<Class<?>, Class<?>> bindingsMap = new HashMap<>();
+    private InjectorImpl(){
+    }
 
+    public static InjectorImpl getInstance() {
+        if (instance == null) {
+            instance = new InjectorImpl();
+        }
+        return instance;
+    }
+
+    private final Map<Class<?>, Class<?>> bindingsMap = new HashMap<>();
+
+    @SuppressWarnings("rawtypes")
     @Override
     public <T> Provider<T> getProvider(Class<T> type){
-        Class<?> binding = bindingsMap.get(type);
+        Class binding =  bindingsMap.get(type);
         if (binding != null) {
-            return new ProviderImpl<>(binding);
+            return new ProviderImpl<> (binding);
         }
         return null;
     }
@@ -37,9 +49,7 @@ public class InjectorImpl implements Injector {
         } else {
             bindingsMap.put(intf, impl.asSubclass(intf));
         }
-
     }
-
 
     private int countNumberOfConstructorInjection(Constructor<?>[] allConstructors) {
         int number = 0;
@@ -55,4 +65,5 @@ public class InjectorImpl implements Injector {
     public <T> void bindSingleton(Class<T> intf, Class<? extends T> impl) {
 
     }
+
 }

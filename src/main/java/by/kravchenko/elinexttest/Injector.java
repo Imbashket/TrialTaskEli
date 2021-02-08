@@ -1,7 +1,4 @@
-package by.kravchenko.elinexttest.injection;
-
-import by.kravchenko.elinexttest.exceptions.TooManyConstructorsException;
-import by.kravchenko.elinexttest.provider.Provider;
+package by.kravchenko.elinexttest;
 
 /**
  * @author Pavel Kravchenko

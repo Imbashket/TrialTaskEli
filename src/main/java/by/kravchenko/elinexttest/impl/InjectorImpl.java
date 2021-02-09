@@ -16,7 +16,10 @@ import java.util.Map;
 public class InjectorImpl implements Injector {
     private static InjectorImpl instance;
 
-    private InjectorImpl(){
+    private final Map<Class<?>, Binding> bindings = new HashMap<>();
+    private final Map<Class<?>, Provider<?>> providers = new HashMap<>();
+
+    private InjectorImpl() {
     }
 
     public static InjectorImpl getInstance() {
@@ -26,32 +29,57 @@ public class InjectorImpl implements Injector {
         return instance;
     }
 
-    private final Map<Class<?>, Class<?>> bindingsMap = new HashMap<>();
-
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> Provider<T> getProvider(Class<T> type){
-        Class binding =  bindingsMap.get(type);
-        if (binding != null) {
-            return new ProviderImpl<> (binding);
+    public <T> Provider<T> getProvider(Class<T> type) {
+        if (providers.containsKey(type)) {
+            return (Provider<T>) providers.get(type);
         }
-        return null;
+        Binding binding = bindings.get(type);
+        if (binding == null) {
+            return null;
+        }
+        Provider<T> provider;
+        if (binding.isSingleton()) {
+            provider = new ProviderSingletonImpl<>((Class<T>) binding.getBinding());
+        } else {
+            provider = new ProviderImpl<>((Class<T>) binding.getBinding());
+        }
+        providers.put(type, provider);
+        return provider;
     }
 
     @Override
     public <T> void bind(Class<T> intf, Class<? extends T> impl) {
-        Constructor<?>[] allConstructors = impl.getConstructors();
-        int constructorsNumber = countNumberOfConstructorInjection(allConstructors);
-        if (constructorsNumber > 1) {
-            throw new TooManyConstructorsException();
-        } else if (constructorsNumber == 0) {
-            throw new ConstructorNotFoundException();
-        } else {
-            bindingsMap.put(intf, impl.asSubclass(intf));
+        doBind(intf, impl, false);
+    }
+
+    @Override
+    public <T> void bindSingleton(Class<T> intf, Class<? extends T> impl) {
+        doBind(intf, impl, true);
+    }
+
+    private <T> void doBind(Class<T> intf, Class<? extends T> impl, boolean isSingleton) {
+        if (bindings.containsKey(intf)) {
+            return;
+        }
+        if (isInjectable(impl)) {
+            bindings.put(intf, new Binding(impl.asSubclass(intf), isSingleton));
         }
     }
 
-    private int countNumberOfConstructorInjection(Constructor<?>[] allConstructors) {
+    private <T> boolean isInjectable(Class<T> clazz) {
+        Constructor<?>[] allConstructors = clazz.getConstructors();
+        int injectAnnotations = countInjectAnnotation(allConstructors);
+        if (injectAnnotations > 1) {
+            throw new TooManyConstructorsException(String.format("%s has too many inject annotations", clazz));
+        } else if (injectAnnotations == 0) {
+            throw new ConstructorNotFoundException(String.format("%s doesn't have any inject annotations", clazz));
+        }
+        return true;
+    }
+
+    private int countInjectAnnotation(Constructor<?>[] allConstructors) {
         int number = 0;
         for (Constructor<?> constructor : allConstructors) {
             if (constructor.isAnnotationPresent(Inject.class)) {
@@ -61,9 +89,22 @@ public class InjectorImpl implements Injector {
         return number;
     }
 
-    @Override
-    public <T> void bindSingleton(Class<T> intf, Class<? extends T> impl) {
+    private static class Binding {
+        private final Class<?> bindingClass;
+        private final boolean isSingleton;
+
+        public Binding(Class<?> bindingClass, boolean isSingleton) {
+            this.bindingClass = bindingClass;
+            this.isSingleton = isSingleton;
+        }
+
+        public Class<?> getBinding() {
+            return bindingClass;
+        }
+
+        public boolean isSingleton() {
+            return isSingleton;
+        }
 
     }
-
 }

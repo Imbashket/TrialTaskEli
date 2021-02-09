@@ -20,34 +20,48 @@ public class ProviderImpl<T> implements Provider<T> {
     @Override
     public T getInstance() {
         try {
-            Constructor<?>[] constructors = clazz.getConstructors();
-            Class<?>[] parameterTypes = null;
-            for (Constructor<?> constructor : constructors) {
-                if (constructor.isAnnotationPresent(Inject.class)) {
-                    parameterTypes = constructor.getParameterTypes();
-                }
-            }
+            Class<?>[] parameterTypes = getParametersTypesInConstructor(clazz);
+            // check default constructor
             if (parameterTypes == null) {
                 return clazz.getDeclaredConstructor().newInstance();
             } else {
-                Object[] objArr = new Object[parameterTypes.length];
-                int i = 0;
-                InjectorImpl injector = InjectorImpl.getInstance();
-                for (Class<?> parameter : parameterTypes) {
-                    Object instance = injector.getProvider(parameter).getInstance();
-                    if (instance == null) {
-                        throw new BindingNotFoundException();
-                    } else {
-                        objArr[i] = instance;
-                        i++;
-                    }
-                }
-                return clazz.getDeclaredConstructor(parameterTypes).newInstance(objArr);
+                return clazz.getDeclaredConstructor(parameterTypes)
+                        .newInstance(getObjectsForParameters(parameterTypes));
             }
         } catch (InstantiationException | IllegalAccessException |
                 InvocationTargetException | NoSuchMethodException e) {
             return null;
         }
+    }
 
+    private Class<?>[] getParametersTypesInConstructor(Class<?> clazz) {
+        Constructor<?>[] constructors = clazz.getConstructors();
+        Class<?>[] parametersTypes = null;
+        for (Constructor<?> constructor : constructors) {
+            if (constructor.isAnnotationPresent(Inject.class)) {
+                parametersTypes = constructor.getParameterTypes();
+            }
+        }
+        return parametersTypes;
+    }
+
+    private Object[] getObjectsForParameters(Class<?>[] parameterTypes) {
+        Object[] objArr = new Object[parameterTypes.length];
+        int i = 0;
+        InjectorImpl injector = InjectorImpl.getInstance();
+        for (Class<?> parameter : parameterTypes) {
+            Provider<?> provider = injector.getProvider(parameter);
+            if (provider == null) {
+                throw new BindingNotFoundException(String.format("Binding for %s doesn't exist", parameter));
+            }
+            Object instance = provider.getInstance();
+            if (instance == null) {
+                throw new BindingNotFoundException(String.format("Can't get instance from provider %s", provider));
+            } else {
+                objArr[i] = instance;
+                i++;
+            }
+        }
+        return objArr;
     }
 }

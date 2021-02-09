@@ -14,21 +14,34 @@ public class BindingTest {
 
     public static class InMemoryEventDAOImpl implements EventDAO {
 
-        public InMemoryEventDAOImpl(Integer n) {
+        public InMemoryEventDAOImpl() {
         }
 
         @Inject
-        public InMemoryEventDAOImpl() {
+        public InMemoryEventDAOImpl(SomeIntf someIntf) {
+        }
+    }
+
+    private interface SomeIntf {
+
+    }
+
+    public static class SomeClass implements SomeIntf{
+
+        @Inject
+        public SomeClass() {
         }
     }
 
     @Test
     void testExistingBinding() {
         Injector injector = InjectorImpl.getInstance(); //создаем имплементацию инжектора
-        injector.bind(EventDAO.class, InMemoryEventDAOImpl.class); //добавляем в инжектор реализацию интерфейса
+        injector.bindSingleton(EventDAO.class, InMemoryEventDAOImpl.class); //добавляем в инжектор реализацию интерфейса
+        injector.bind(SomeIntf.class, SomeClass.class);
         Provider<EventDAO> daoProvider = injector.getProvider(EventDAO.class); //получаем инстанс класса из инжектора
         assertNotNull(daoProvider);
         assertNotNull(daoProvider.getInstance());
+        assertEquals(daoProvider.getInstance(), daoProvider.getInstance());
         assertSame(InMemoryEventDAOImpl.class, daoProvider.getInstance().getClass());
     }
 

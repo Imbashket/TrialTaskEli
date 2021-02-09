@@ -1,0 +1,10 @@
+by\kravchenko\elinexttest\impl\InjectorImpl.class
+by\kravchenko\elinexttest\impl\ProviderSingletonImpl.class
+by\kravchenko\elinexttest\Inject.class
+by\kravchenko\elinexttest\Provider.class
+by\kravchenko\elinexttest\impl\ProviderImpl.class
+by\kravchenko\elinexttest\impl\exceptions\BindingNotFoundException.class
+by\kravchenko\elinexttest\impl\InjectorImpl$Binding.class
+by\kravchenko\elinexttest\impl\exceptions\ConstructorNotFoundException.class
+by\kravchenko\elinexttest\impl\exceptions\TooManyConstructorsException.class
+by\kravchenko\elinexttest\Injector.class

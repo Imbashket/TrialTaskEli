@@ -60,7 +60,7 @@ public class InjectorImpl implements Injector {
     }
 
     private <T> void doBind(Class<T> intf, Class<? extends T> impl, boolean isSingleton) {
-        if (bindings.containsKey(intf)) {
+        if (bindings.containsKey(intf) && isSingleton) {
             return;
         }
         if (isInjectable(impl)) {

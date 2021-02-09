@@ -1,6 +1,7 @@
 package by.kravchenko.elinexttest;
 
 import by.kravchenko.elinexttest.impl.InjectorImpl;
+import by.kravchenko.elinexttest.impl.exceptions.ConstructorNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,7 +14,6 @@ public class BindingTest {
     }
 
     public static class InMemoryEventDAOImpl implements EventDAO {
-
         public InMemoryEventDAOImpl() {
         }
 
@@ -23,11 +23,9 @@ public class BindingTest {
     }
 
     private interface SomeIntf {
-
     }
 
     public static class SomeClass implements SomeIntf{
-
         @Inject
         public SomeClass() {
         }

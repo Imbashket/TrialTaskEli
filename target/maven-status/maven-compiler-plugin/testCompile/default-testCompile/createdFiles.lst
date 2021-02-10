@@ -1,5 +1,13 @@
-by\kravchenko\elinexttest\BindingTest$EventDAO.class
-by\kravchenko\elinexttest\BindingTest$SomeClass.class
 by\kravchenko\elinexttest\BindingTest$SomeIntf.class
 by\kravchenko\elinexttest\BindingTest.class
+by\kravchenko\elinexttest\InjectorImplTest$TwoConstrDefaultInject.class
+by\kravchenko\elinexttest\BindingTest$EventDAO.class
+by\kravchenko\elinexttest\BindingTest$SomeClass.class
+by\kravchenko\elinexttest\InjectorImplTest$TestIntf1.class
 by\kravchenko\elinexttest\BindingTest$InMemoryEventDAOImpl.class
+by\kravchenko\elinexttest\InjectorImplTest$TestIntf2.class
+by\kravchenko\elinexttest\InjectorImplTest.class
+by\kravchenko\elinexttest\InjectorImplTest$OneDefaultConstr.class
+by\kravchenko\elinexttest\InjectorImplTest$InjectTwoConstr.class
+by\kravchenko\elinexttest\InjectorImplTest$TwoConstrParameterizedInject.class
+by\kravchenko\elinexttest\InjectorImplTest$InjectDefaultConstr.class

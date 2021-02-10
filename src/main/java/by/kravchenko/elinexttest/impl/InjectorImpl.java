@@ -7,8 +7,8 @@ import by.kravchenko.elinexttest.impl.exceptions.TooManyConstructorsException;
 import by.kravchenko.elinexttest.Provider;
 
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Pavel Kravchenko
@@ -16,8 +16,8 @@ import java.util.Map;
 public class InjectorImpl implements Injector {
     private static InjectorImpl instance;
 
-    private final Map<Class<?>, Binding> bindings = new HashMap<>();
-    private final Map<Class<?>, Provider<?>> providers = new HashMap<>();
+    private final Map<Class<?>, Binding> bindings = new ConcurrentHashMap<>();
+    private final Map<Class<?>, Provider<?>> providers = new ConcurrentHashMap<>();
 
     private InjectorImpl() {
     }
@@ -32,21 +32,23 @@ public class InjectorImpl implements Injector {
     @SuppressWarnings("unchecked")
     @Override
     public <T> Provider<T> getProvider(Class<T> type) {
-        if (providers.containsKey(type)) {
-            return (Provider<T>) providers.get(type);
+        synchronized (this) {
+            if (providers.containsKey(type)) {
+                return (Provider<T>) providers.get(type);
+            }
+            Binding binding = bindings.get(type);
+            if (binding == null) {
+                return null;
+            }
+            Provider<T> provider;
+            if (binding.isSingleton()) {
+                provider = new ProviderSingletonImpl<>((Class<T>) binding.getBinding());
+            } else {
+                provider = new ProviderImpl<>((Class<T>) binding.getBinding());
+            }
+            providers.put(type, provider);
+            return provider;
         }
-        Binding binding = bindings.get(type);
-        if (binding == null) {
-            return null;
-        }
-        Provider<T> provider;
-        if (binding.isSingleton()) {
-            provider = new ProviderSingletonImpl<>((Class<T>) binding.getBinding());
-        } else {
-            provider = new ProviderImpl<>((Class<T>) binding.getBinding());
-        }
-        providers.put(type, provider);
-        return provider;
     }
 
     @Override

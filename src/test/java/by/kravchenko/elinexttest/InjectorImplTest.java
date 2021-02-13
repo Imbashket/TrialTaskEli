@@ -4,6 +4,7 @@ import by.kravchenko.elinexttest.impl.InjectorImpl;
 import by.kravchenko.elinexttest.impl.exceptions.ConstructorNotFoundException;
 import by.kravchenko.elinexttest.impl.exceptions.TooManyConstructorsException;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -16,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class InjectorImplTest {
 
-    @AfterEach
+    @BeforeEach
     public void resetSingletonInjector() throws Exception {
         Field instance = InjectorImpl.class.getDeclaredField("instance");
         instance.setAccessible(true);
